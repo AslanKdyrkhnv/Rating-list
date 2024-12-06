@@ -3,9 +3,9 @@ import { useState } from "react";
 import Button from "./shard/Button";
 import RatingSelect from "./RatingSelect";
 import FeedbackContext from "../context/FeedbackContext";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 function FeedbackForm() {
-  const { addItem, feedbackEdit } = useContext(FeedbackContext); // add from context
+  const { addItem } = useContext(FeedbackContext); // add from context
   const [text, setText] = useState(""); // text in input
   const [rating, setRating] = useState(10); // rating in RatingSelect
   const [btnDisabled, setBtnDisabled] = useState(true);
@@ -26,12 +26,12 @@ function FeedbackForm() {
     setText(e.target.value);
   };
 
-  useEffect(() => {
-    if (feedbackEdit.edit === true) {
-      setText(feedbackEdit.item.text);
-      setBtnDisabled(false);
-    }
-  }, [feedbackEdit]);
+  // useEffect(() => {
+  //   if (feedbackEdit.edit === true) {
+  //     setText(feedbackEdit.item.text);
+  //     setBtnDisabled(false);
+  //   }
+  // }, [feedbackEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

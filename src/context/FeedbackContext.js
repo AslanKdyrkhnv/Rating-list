@@ -1,65 +1,54 @@
-import { createContext, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-
+import { createContext, useState, useEffect } from "react";
 const FeedbackContext = createContext();
 
 export const FeedbackProvider = ({ children }) => {
-  const [feedbackEdit, setFeedbackEdit] = useState({
-    item: {},
-    edit: false,
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState([]);
 
-  const deleteItem = (id) => {
+  useEffect(() => {
+    feedbackFetch();
+  }, []);
+
+  // GET method
+  const feedbackFetch = async () => {
+    const respnose = await fetch(`/feedback`);
+    const data = await respnose.json();
+
+    setFeedback(data);
+    setIsLoading(false);
+  };
+
+  // DELETE method
+  const deleteItem = async (id) => {
     if (window.confirm("Are you sure?")) {
+      await fetch(`/feedback/${id}`, {
+        method: "DELETE",
+      });
       setFeedback(feedback.filter((item) => item.id !== id));
     }
   };
 
-  const addItem = (item) => {
-    item.id = uuidv4();
-    setFeedback([item, ...feedback]);
-  };
-
-  const editItem = (item) => {
-    setFeedbackEdit({
-      item,
-      edit: true,
+  // POST method
+  const addItem = async (item) => {
+    const respnose = await fetch("/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
     });
-    setFeedback(
-      feedback.filter((ele) => ele.id !== item.id && ele.text !== item.text)
-    );
+
+    const data = await respnose.json();
+    setFeedback([data, ...feedback]);
   };
 
-  const [feedback, setFeedback] = useState([
-    {
-      id: 1,
-      text: "Hello world",
-      rating: 7,
-    },
-    {
-      id: 2,
-      text: "Hello world 2",
-      rating: 9,
-    },
-    {
-      id: 3,
-      text: "Hello world 3",
-      rating: 5,
-    },
-    {
-      id: 4,
-      text: "Hello world 4",
-      rating: 8,
-    },
-  ]);
   return (
     <FeedbackContext.Provider
       value={{
         feedback,
         deleteItem,
+        isLoading,
         addItem,
-        editItem,
-        feedbackEdit,
       }}
     >
       {children}
